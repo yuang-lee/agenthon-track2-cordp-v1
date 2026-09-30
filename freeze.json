@@ -1,0 +1,19 @@
+{
+  "summary": "Frozen v1 experiment code and dev-10 baseline. Six calls, seed 0, temperature 0, thinking disabled, plain JSON prompting, strength 1, 4000 draws. Only live House endpoint replaces the local 30B endpoint. No v2 prompts or cached predictions are included.",
+  "local_reference_score": 0.876994,
+  "local_reference_model": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+  "house_model": "nvidia/nemotron-3-super-120b-a12b",
+  "house_revision": "rl-030326-fp8",
+  "file_sha256": {
+    "pipelines/cordp.py": "b13e9ce2a32c089bac86ee1482b85a9cad13accb630f860f51bfb85734b658eb",
+    "pipelines/engine.py": "85d03378b108163cf8d6ed1d1e94c51d82396973de5a5185042339aa5741767a",
+    "pipelines/rules.py": "6ce0bc18437edbd787a841b03f09ab75711bf0d962f31494ad3677ff675f7a10",
+    "pipelines/reader.py": "b3150fe39c33e8120bf89218562cf1ef8a1e1950b7109549a8952fb9d9c0b5a3",
+    "pipelines/llm.py": "1e555bb7f8e24d528d42a8776f98143b3b708f1aff078d3441a990a84651acdb",
+    "pipelines/ebest.json": "7f4bbf4d42641d9228ce480efd535dfdf32f80d505e96c52ecae3da09c1728f8",
+    "pipelines/__init__.py": "e1ef9ef121f48bb0076401e5c4141f24955ffe78b8fa68605dd2a66560df1d1a",
+    "scripts/m0_baseline.py": "5c5defc933858d9a42de8d81f23dbc54e9c9f1328d5bc17c08fc31bd3b45567e",
+    "pipelines/fomc_dates.csv": "13711f8554f2e0441b437ef009989949677860c781163a9e95f6e4749eae726f",
+    "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1"
+  }
+}
