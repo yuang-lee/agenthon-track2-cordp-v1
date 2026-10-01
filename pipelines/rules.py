@@ -56,6 +56,11 @@ def apply_rules(X: np.ndarray, cells: list, unit_dir: pathlib.Path, asof: str, r
             if h > fn.get("max_h", 63) or not cal:
                 continue
             end = a0 + pd.tseries.offsets.BDay(int(h))
+            # An empty lookup outside the packaged calendar is unknown, not
+            # evidence of no scheduled meeting. Retain the incoming spread.
+            if a0 < cal[0] or end > cal[-1]:
+                notes.append(f"fomc_narrow: {a}@{h} outside calendar coverage; retained spread")
+                continue
             if not any(a0 < d <= end for d in cal):
                 X[:, i] = med[i] + (X[:, i] - med[i]) / float(fn.get("factor", 1.15))
                 notes.append(f"fomc_narrow: {a}@{h} has no scheduled statement in its leg -> spread / {fn.get('factor', 1.15)}")

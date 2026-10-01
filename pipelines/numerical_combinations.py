@@ -8,6 +8,43 @@ exactly. Log-level columns retain their positive support under center/width edit
 import numpy as np
 
 
+def bounded_center(baseline, proposal, weight, radius, log_columns=()):
+    """Limit an entire proposed center vector using baseline80-percent widths.
+
+    A single shrink factor preserves the proposed relative cell adjustments;
+    baseline joint residuals stay fixed in model coordinates. Radius bounds the
+    full proposal before the ensemble weight is applied. No outcomes are read.
+    """
+    x, y = [np.asarray(p, dtype=float) for p in (baseline, proposal)]
+    if x.ndim != 2 or x.shape != y.shape or not np.isfinite([x, y]).all():
+        raise ValueError('Require matched finite parent draws')
+    if not 0 <= weight <= 1 or not np.isfinite(radius) or radius <= 0:
+        raise ValueError('Invalid ensemble weight or trust radius')
+    columns = list(log_columns)
+    if np.any(x[:, columns] <= 0) or np.any(y[:, columns] <= 0):
+        raise ValueError('FX inputs must have positive support')
+    a, b = x.copy(), y.copy()
+    a[:, columns], b[:, columns] = np.log(a[:, columns]), np.log(b[:, columns])
+    delta = np.median(b, axis=0) - np.median(a, axis=0)
+    width = np.quantile(a, .9, axis=0) - np.quantile(a, .1, axis=0)
+    if np.any((width <= 0) & (delta != 0)):
+        return x.copy(), {'applied': False, 'fallback': 'Nonzero shift with zero baseline width'}
+    standardized = np.divide(abs(delta), width, out=np.zeros_like(delta), where=width > 0)
+    largest = float(standardized.max())
+    factor = min(1., radius/largest) if largest else 1.
+    adjustment = weight*factor*delta
+    if not np.any(adjustment):
+        result = x.copy()
+    else:
+        result = a+adjustment
+        result[:, columns] = np.exp(result[:, columns])
+    if not np.isfinite(result).all():
+        raise ValueError('Nonfinite bounded center')
+    return result, {'applied': bool(np.any(adjustment)), 'weight': weight,
+                   'radius_before_weight': radius, 'max_proposal_in_baseline80widths': largest,
+                   'joint_shrink_factor': factor, 'effective_weight': weight*factor}
+
+
 def conditional_common(source, scale, positive_columns=()):
     """Shrink a covariance-weighted common component in the official raw units.
 

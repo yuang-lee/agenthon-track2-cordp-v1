@@ -1,36 +1,71 @@
 ## Executive summary (read this first)
 
-This source-only release adds covariance-weighted common-component shrinkage to
-alpha-extractor's existing numerical forecast. It makes no language-model calls.
-The image contains no task panels, text corpora, realized outcomes, cached
-forecasts, pretrained neural weights or credentials. Source hashes are frozen in
-freeze.json; dependencies and the Python base image are pinned.
+This candidate combines a numerical joint forecast with independent House-model
+scenarios. The image contains code, configuration and a public meeting calendar.
+It contains no task panels, article corpus, outcomes, cached predictions, model
+weights or credentials. Local reproducibility is verified; the organizer's House
+proxy and sealed evaluation have not yet been tested with this candidate.
 
-## Forecast behavior
+## Runtime behavior
 
-The inherited engine fits Theta and numerical moments to the supplied history,
-simulates joint paths, and applies the existing calendar/corpus-metadata rules.
-The new step shrinks the minimum-variance common component by0.75 in raw target
-coordinates, preserving every within-draw cell difference and each column mean.
-It estimates covariance from the generated draws, without target outcomes.
-Single-cell cases retain the baseline. Degenerate covariance or invalid positive
-FX support also retain the complete baseline. Default draw seed remains0.
+The inherited numerical engine fits the supplied history, simulates 4,000 joint
+draws and applies calendar and corpus-metadata rules. Generalized least squares
+(GLS) calibration shrinks the covariance-weighted common component by 0.75 while
+preserving each column mean and every within-draw coordinate difference.
 
-The transformation preserves the variogram term algebraically. It changes the
-marginal distributions; their medians and higher moments need not stay fixed.
-This is a statistical calibration candidate, not evidence that news reasoning
-improved forecasting. It uses no LLM or additional foundation-model checkpoint.
+Routing uses target frequency and units, not a list of known task identifiers:
 
-## Provenance and limitations
+- Monthly targets: mix 75% numerical joint paths with 25% LLM scenario paths.
+- Daily, non-FX, homogeneous multi-cell targets (one asset or all UST yields):
+  transfer bounded common shifts from LLM scenarios into a 25% path mixture.
+  The shift limit is half the smallest numerical marginal 80% interval width.
+- Other target grids: retain the numerical forecast without model requests.
 
-The original numerical engine/configuration and calendar derive from the team's
-MIT-licensed Agenthon-2026-track2-forecasting project. Calendar publication vintages
-have not been independently reconstructed. Research used local reconstructed
-references and repeated public-practice comparisons; this release makes no claim
-of sealed leaderboard improvement or organizer eligibility certification.
+Eligible tasks make 25 separate requests, using seeds 0 through 24, temperature 1,
+thinking disabled and a 3,000-token output limit. Each prompt requests one joint
+future realization and supplies the last 60 observations plus frozen dated text.
+The LLM does not receive the numerical forecast; the combination happens afterward.
+Text is selected by the frozen inherited reader, rather than an external retrieval
+service. There is no vendor web search or unrestricted network use.
 
-The default forecast entrypoint is tested against the frozen research candidate
-under a read-only root filesystem, no network, and nonroot execution. Runtime
-outputs contain only forecast.parquet, forecast_meta.json and forecast_rationale.md.
-The upload descriptor discloses models:[], category api. A separate team claim is
-created using the official toolkit; the raw Team Key never enters this repository.
+Requests use MODEL_ENDPOINT, MODEL_NAME and MODEL_TOKEN supplied by the organizer.
+Strict JSON Schema output is requested. Generic NVIDIA NIM documentation supports
+this request format, but the actual House proxy/backend behavior remains untested.
+HTTP or transport failure stops further requests for that task and retains GLS;
+no uncertain request is retried. Incomplete or invalid scenario replies use the
+frozen history-based fallback. Outputs include the actual call ledger and fallback
+information, without credentials or model endpoint values.
+
+## Provenance and selection history
+
+The MIT-licensed numerical engine, configuration and meeting calendar derive from
+the alpha-extractor team's Agenthon-2026-track2-forecasting project. The calendar's
+publication vintages have not been independently reconstructed. A packaging guard
+prevents an uncovered future calendar interval from being treated as proof that
+no FOMC meeting occurs; covered historical behavior is unchanged.
+
+The source hashes, prompt code and numerical settings are recorded in freeze.json.
+The Python base image and dependency versions are pinned. Research used public
+practice inputs, locally reconstructed references, model/component ablations and
+two separate model-generation blocks. These are repeated comparisons on explored
+cards, not independent held-out validation. The fixed routing and parameters were
+selected during that research. We do not claim that post-cutoff selection is
+exempt from the organizer's artifact policy or certify competition eligibility.
+
+Local generation used NVIDIA Nemotron 3 Super 120B A12B FP8, Hugging Face revision
+744b1880a37996c5d56bf454ae164dfd74d77c4e, with an Ampere-compatible local vLLM runtime.
+Those weights are not packaged. The submission discloses only the injected House
+model, nvidia/nemotron-3-super-120b-a12b, version/revision rl-030326-fp8, API access,
+training cutoff unpublished. Local decoding need not match the House backend.
+
+## Verification and identity
+
+The actual container reproduces all 103 frozen practice outputs through exact
+request matching and archived-reply replay, including 600 HTTP requests. This
+tests code and transport, not new inference or House compatibility. The minimal
+official exemplar and an HTTP 503 fallback also pass local official gates. The
+container runs nonroot, with a read-only root filesystem and bounded resources.
+
+The upload ZIP contains a pinned image descriptor and the toolkit-generated
+Team 153 claim. The raw Team Key is absent from this source, image and ZIP.
+Only forecast.parquet, forecast_meta.json and forecast_rationale.md are emitted.
