@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r /opt/agent/requirements.txt && pip check
 COPY pipelines/ /opt/agent/pipelines/
 COPY scripts/ /opt/agent/scripts/
 COPY Dockerfile freeze.json LICENSE /opt/agent/
-RUN printf '#!/bin/sh\nexec python3 /opt/agent/pipelines/scenario_agent.py "$@"\n' > /usr/local/bin/forecast && chmod 755 /usr/local/bin/forecast
+RUN printf '#!/bin/sh\nexec python3 /opt/agent/pipelines/scenario_direction_agent.py "$@"\n' > /usr/local/bin/forecast && chmod 755 /usr/local/bin/forecast
 USER 1000:1000
 WORKDIR /tmp
 CMD ["forecast", "--help"]

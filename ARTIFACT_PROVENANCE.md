@@ -13,13 +13,22 @@ draws and applies calendar and corpus-metadata rules. Generalized least squares
 (GLS) calibration shrinks the covariance-weighted common component by 0.75 while
 preserving each column mean and every within-draw coordinate difference.
 
-Routing uses target frequency and units, not a list of known task identifiers:
+Routing uses target frequency, asset units and target type, not known task IDs:
 
-- Monthly targets: mix 75% numerical joint paths with 25% LLM scenario paths.
-- Daily, non-FX, homogeneous multi-cell targets (one asset or all UST yields):
-  transfer bounded common shifts from LLM scenarios into a 25% path mixture.
-  The shift limit is half the smallest numerical marginal 80% interval width.
-- Other target grids: retain the numerical forecast without model requests.
+- Monthly targets retain the25 percent whole-scenario mixture.
+- Daily Treasury level grids with multiple cells use a bounded25 percent mixture
+  toward the numerical column-mean common center. House proposals select only
+  relative orientation, by reflecting a whole row around its mean if its relative
+  direction opposes the model scenario. Every within-row absolute difference is
+  preserved; the LLM does not set the common level.
+- Daily single-asset FX level grids with multiple horizons use a bounded25 percent
+  common mixture toward the last observed value. They make zero House requests.
+- Other grids retain GLS without model requests.
+
+The common-shift limit is half the smallest numerical marginal80 percent width.
+Final price support and finite values are checked. Numerical-only corrections
+retain GLS if support fails. Model service failure retains the numerical common
+center on rates and GLS on monthly tasks; the request loop stops without retry.
 
 Eligible tasks make 25 separate requests, using seeds 0 through 24, temperature 1,
 thinking disabled and a 3,000-token output limit. Each prompt requests one joint
@@ -31,7 +40,7 @@ service. There is no vendor web search or unrestricted network use.
 Requests use MODEL_ENDPOINT, MODEL_NAME and MODEL_TOKEN supplied by the organizer.
 Strict JSON Schema output is requested. Generic NVIDIA NIM documentation supports
 this request format, but the actual House proxy/backend behavior remains untested.
-HTTP or transport failure stops further requests for that task and retains GLS;
+HTTP or transport failure stops further requests and retains that route's numerical forecast;
 no uncertain request is retried. Incomplete or invalid scenario replies use the
 frozen history-based fallback. Outputs include the actual call ledger and fallback
 information, without credentials or model endpoint values.
@@ -47,7 +56,8 @@ no FOMC meeting occurs; covered historical behavior is unchanged.
 The source hashes, prompt code and numerical settings are recorded in freeze.json.
 The Python base image and dependency versions are pinned. Research used public
 practice inputs, locally reconstructed references, model/component ablations and
-two separate model-generation blocks. These are repeated comparisons on explored
+two separate model-generation blocks, matched no-news controls and fixed numerical
+location controls on83 previously explored newer calendar windows. These are repeated comparisons on explored
 cards, not independent held-out validation. The fixed routing and parameters were
 selected during that research. We do not claim that post-cutoff selection is
 exempt from the organizer's artifact policy or certify competition eligibility.
@@ -61,9 +71,10 @@ training cutoff unpublished. Local decoding need not match the House backend.
 ## Verification and identity
 
 The actual container reproduces all 103 frozen practice outputs through exact
-request matching and archived-reply replay, including 600 HTTP requests. This
+request matching and archived-reply replay, including 584 HTTP requests. This
 tests code and transport, not new inference or House compatibility. The minimal
-official exemplar and an HTTP 503 fallback also pass local official gates. The
+official exemplar, network-disabled numerical FX and an HTTP 503 numerical-center
+fallback also pass local official gates. All106cases passed before publication. The
 container runs nonroot, with a read-only root filesystem and bounded resources.
 
 The upload ZIP contains a pinned image descriptor and the toolkit-generated

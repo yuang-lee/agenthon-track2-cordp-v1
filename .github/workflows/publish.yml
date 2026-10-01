@@ -1,7 +1,7 @@
 # ## Executive summary (read this first)
 # Publish the isolated, frozen source context as an amd64 image. No team keys,
 # input data, cached predictions or model weights are present in this repository.
-name: Publish frozen scenario hybrid v2
+name: Publish frozen scenario hybrid v3
 on:
   workflow_dispatch:
 permissions:
@@ -24,7 +24,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/${{ github.repository }}:scenario-hybrid-v2
+          tags: ghcr.io/${{ github.repository }}:scenario-hybrid-v3
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
       - name: Record immutable image reference
         env:

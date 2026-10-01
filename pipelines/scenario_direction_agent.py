@@ -1,6 +1,6 @@
 """## Executive summary (read this first)
 
-Run the frozen statistical GLS forecast plus House scenario distribution mixture
+Run numerical location controls with House directions on eligible Treasury grids
 on freshly mounted task inputs. Verify the code manifest and input cutoff before
 calling the model. Export the three official contract files, with truthful route,
 request counts and fallbacks. Never include endpoint credentials or cached answers.
@@ -15,7 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / 'pipelines'), str(ROOT / 'scripts')]
 from engine import write
-from pipelines.scenario_hybrid import forecast
+from pipelines.scenario_direction_hybrid import forecast
 
 
 def main():
@@ -45,32 +45,34 @@ def main():
     samples, cells, info, audit = forecast(unit, mode=settings['mode'], news=settings['news'], row_seed=0)
     write(samples, cells, info, args.out)
     fallback = audit.get('service_fallback') or audit.get('support_fallback')
-    actual_route = 'gls_only' if fallback else audit['route']
+    actual_route = audit['actual_route']
     meta_path = args.out.parent / 'forecast_meta.json'
     meta = json.loads(meta_path.read_text())
     meta['rationale']['method'] = ('Frozen numerical baseline with GLS common shrinkage0.75; '
                                   'House scenario route: ' + actual_route)
     meta['house_requests'] = audit['calls']
-    meta['reasoning_applied'] = actual_route != 'gls_only'
+    meta['reasoning_applied'] = audit['reasoning_applied']
     meta['reasoning_skipped_reason'] = (fallback or audit.get('input_fallback') or
-                                       ('outside scenario scope' if actual_route == 'gls_only' else ''))
+                                       ('numerical-only route' if not audit['reasoning_applied'] else ''))
     meta_path.write_text(json.dumps(meta, indent=2, allow_nan=False) + '\n')
     details = {'asof': cutoff, 'n_draws': len(samples), 'baseline_seed': 0, 'mixture_row_seed': 0,
         'settings': settings, 'requested_route': audit['route'], 'actual_route': actual_route,
         'house_requests': audit['calls'], 'max_requests': 25, 'max_output_tokens_per_request': 3000,
         'thinking': False, 'temperature': 1., 'invalid_scenario_count': len(audit['model_response_errors']),
         'invalid_scenario_policy': 'raw-history last level or zero cumulative return, preserving the frozen experiment',
-        'service_failure_policy': 'retain GLS and stop requests without retry', 'fallback': fallback,
+        'service_failure_policy': 'retain numerical common-center for rates, GLS for monthly; stop without retry', 'fallback': fallback,
         'input_fallback': audit.get('input_fallback'),
         'request_ledger': audit.get('request_ledger', []), 'cells': cells,
-        'baseline_rule_notes': info.get('rule_notes', [])}
+        'baseline_rule_notes': info.get('rule_notes', []),
+        'orientation': audit.get('orientation')}
     (args.out.parent / 'forecast_rationale.md').write_text(
         '## Executive summary (read this first)\n\n'
-        'The statistical baseline is calibrated by shrinking its covariance-weighted common component. '
-        'Eligible tasks use25 House-generated joint scenarios from numerical history and optional dated text. '
-        'Monthly targets mix25percent complete scenario paths; eligible daily targets mix bounded common shifts '
-        'while retaining within-path differences. Other tasks keep GLS. Model scenarios are proposals, '
-        'not verified facts or calibrated event probabilities. Actual routing and fallbacks follow.\n\n'
+        'The numerical forecast uses GLS calibration. Daily Treasury grids receive a bounded mixture '
+        'toward the numerical common center.25 House scenarios select whole-row relative orientation, '
+        'preserving all within-row absolute differences. Single-asset daily FX uses the same bounded '
+        'mixture toward the last observation with zero model requests. Monthly targets retain a25percent '
+        'whole-scenario mixture; other tasks retain GLS. Model outputs are proposals, not calibrated '
+        'event probabilities. Actual routing and numerical fallbacks follow.\n\n'
         + json.dumps(details, indent=2, allow_nan=False) + '\n')
     print(f'Wrote {len(samples)} joint draws; route={actual_route}; House requests={audit["calls"]}')
 

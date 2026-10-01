@@ -1,6 +1,6 @@
 {
-  "executive_summary": "Frozen exploratory scenario-hybrid package, pending actual Houseproxyvalidation and freshdailygeneration. No evaluation inputs, answers, cached forecasts orcredentials.",
-  "created_utc": "2026-10-01T06:27:05.015374+00:00",
+  "executive_summary": "Numerical Treasury common centers with House relative directions; single-asset daily FXpersistence with zero calls; unchanged monthly scenario mixture. Code/configuration only, no inputs, cached replies, outcomes, weights or credentials.",
+  "created_utc": "2026-10-01T10:29:36.113633+00:00",
   "settings": {
     "mode": "monthly_daily",
     "news": true,
@@ -44,7 +44,11 @@
     "whole_monthly_mixture_weight": 0.25,
     "daily_common_mixture_weight": 0.25,
     "daily_radius": 0.5,
-    "GLS_common_scale": 0.75
+    "GLS_common_scale": 0.75,
+    "daily_rates_location": "numerical column means",
+    "daily_rates_orientation": "House proposal dot-product sign, full row reflection",
+    "daily_fx_location": "last observation, zero House calls",
+    "daily_orientation_fraction": 1.0
   },
   "models": [
     {
@@ -60,9 +64,9 @@
     "Local practice reproduction is not official performance.",
     "Actual selection/provenance history must accompany a release; local gates do not certify temporal eligibility."
   ],
-  "assembly_note": "Initial copy stopped beforefreeze because calendar source isdata/fomc_dates.csv. Correctsource copied to standalonepipelines/fomc_dates.csv. Container smoke caught Dockerfile missing from image; COPY now includes this hashed buildfile.",
+  "assembly_note": "Exact v2 pinned dependency closure and packaged calendar coverage guard. Replace runtime routing/decoder and entrypoint; original v2context unchanged.",
   "files_sha256": {
-    "Dockerfile": "6c57270c4ac1336c017f171f0db9e3eac9d81c024bb86d9257d1e08c6154b3e1",
+    "Dockerfile": "67845e79690d17ec7ed34499e9f68af73e1fba48455f4ebddff878d4a69d27ca",
     "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
     "pipelines/__init__.py": "e1ef9ef121f48bb0076401e5c4141f24955ffe78b8fa68605dd2a66560df1d1a",
     "pipelines/agentic_ablations.py": "e9f6c066c9bf47bdc3bb576cdef9796f300fe3206b74f8b206a8469708856f54",
@@ -81,10 +85,12 @@
     "pipelines/numerical_combinations.py": "1d7c7d71b77e690058b748fdba58b7fae716038ef9702a479f2f28f4f445e261",
     "pipelines/reader.py": "b3150fe39c33e8120bf89218562cf1ef8a1e1950b7109549a8952fb9d9c0b5a3",
     "pipelines/rules.py": "036d9d5562bfd6d69e254ae9b0db420dc0409f58c70a85056189062988c5e0b4",
-    "pipelines/scenario_agent.py": "f85df2be269e33053f8b17760229262328dd4f595205381ac3f070785e08c3f2",
-    "pipelines/scenario_hybrid.py": "0559cc02ede923726d40507290865af9c04d0d7e10918f660444c8eff5fb12fd",
+    "pipelines/scenario_direction_agent.py": "3835315bdcec94859a457627c8fdbcda0a496b08a37ded2fa3ea93a89308ff00",
+    "pipelines/scenario_direction_hybrid.py": "6262e299a87bf144602f41b2f8f8fa9dc182730a2f944b0a3586a4752f909901",
     "requirements.txt": "8adf7215b934d795f907f0e5ada842fc8c6a4f11643562247afb3f8ce25af353",
     "scripts/m0_baseline.py": "5c5defc933858d9a42de8d81f23dbc54e9c9f1328d5bc17c08fc31bd3b45567e"
   },
-  "package_revision": "calendar-coverage guard; preserve all covered historical behavior"
+  "package_revision": "55189f30676c933d3ba37c25c80fc28fe83d65a48a6c89413584ca041e8db348",
+  "candidate_name": "scenario-hybrid-v3",
+  "selection_record": "Explored publicpractice references, repeated generation, matched no-news, fixed numerical location controls and83previously explored newer calendar windows. Not sealed holdout; no eligibility certification."
 }
