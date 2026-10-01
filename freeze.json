@@ -1,19 +1,22 @@
 {
-  "summary": "Frozen v1 experiment code and dev-10 baseline. Six calls, seed 0, temperature 0, thinking disabled, plain JSON prompting, strength 1, 4000 draws. Only live House endpoint replaces the local 30B endpoint. No v2 prompts or cached predictions are included.",
-  "local_reference_score": 0.876994,
-  "local_reference_model": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
-  "house_model": "nvidia/nemotron-3-super-120b-a12b",
-  "house_revision": "rl-030326-fp8",
-  "file_sha256": {
-    "pipelines/cordp.py": "b13e9ce2a32c089bac86ee1482b85a9cad13accb630f860f51bfb85734b658eb",
-    "pipelines/engine.py": "85d03378b108163cf8d6ed1d1e94c51d82396973de5a5185042339aa5741767a",
-    "pipelines/rules.py": "6ce0bc18437edbd787a841b03f09ab75711bf0d962f31494ad3677ff675f7a10",
-    "pipelines/reader.py": "b3150fe39c33e8120bf89218562cf1ef8a1e1950b7109549a8952fb9d9c0b5a3",
-    "pipelines/llm.py": "1e555bb7f8e24d528d42a8776f98143b3b708f1aff078d3441a990a84651acdb",
-    "pipelines/ebest.json": "7f4bbf4d42641d9228ce480efd535dfdf32f80d505e96c52ecae3da09c1728f8",
+  "executive_summary": "Candidate source-only image context; not yet built or published. Frozen teammate numeric baseline plus GLScommon75 on all multi-cell cards; explicit fallback for single cells, singular covariance or invalid positive support.",
+  "created_utc": "2026-10-01T02:10:50.331701+00:00",
+  "files_sha256": {
+    "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+    "Dockerfile": "67d2d41d35dcf4fb1b1aa81dd078954bbcdab4494874e0820235cedd9b84373e",
+    "requirements.txt": "8adf7215b934d795f907f0e5ada842fc8c6a4f11643562247afb3f8ce25af353",
     "pipelines/__init__.py": "e1ef9ef121f48bb0076401e5c4141f24955ffe78b8fa68605dd2a66560df1d1a",
-    "scripts/m0_baseline.py": "5c5defc933858d9a42de8d81f23dbc54e9c9f1328d5bc17c08fc31bd3b45567e",
+    "pipelines/engine.py": "5e6be65dcd9b35e2825ec9816e76b283651c44f185efde855ace3276f31d2e16",
     "pipelines/fomc_dates.csv": "13711f8554f2e0441b437ef009989949677860c781163a9e95f6e4749eae726f",
-    "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1"
-  }
+    "pipelines/numerical_combinations.py": "3641a18249aaaf0fe735b1a299e8f23402e5190307da67c9f98b031251004c41",
+    "pipelines/ebest.json": "7f4bbf4d42641d9228ce480efd535dfdf32f80d505e96c52ecae3da09c1728f8",
+    "pipelines/agent.py": "57dd538e64dfc2d99d3ae54dae0823cba642712e0b113746a0ab21b8ae644fd5",
+    "pipelines/rules.py": "9dfd6f3702c6e97abc4be5179e531114262d8b6b6d552b299a80759d5bd67d9b",
+    "scripts/m0_baseline.py": "5c5defc933858d9a42de8d81f23dbc54e9c9f1328d5bc17c08fc31bd3b45567e"
+  },
+  "research_run": "run-gls-common103-v1/gls_all_75",
+  "LLM_calls": 0,
+  "neural_weights": false,
+  "contains_gt_or_task_data": false,
+  "model_disclosure": []
 }

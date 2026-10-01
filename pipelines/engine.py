@@ -89,12 +89,17 @@ def classical_centre(levels: np.ndarray, steps: np.ndarray, target_type: str, sm
     return path
 
 
-def simulate(unit_dir: pathlib.Path, cfg: dict, seed: int) -> tuple[np.ndarray, list[tuple[str, int]], dict]:
+def simulate(unit_dir: pathlib.Path, cfg: dict, seed: int, *, asof_override=None) -> tuple[np.ndarray, list[tuple[str, int]], dict]:
     """Return (samples[n_draws, cells], cells, info); cells sorted by asset id then horizon."""
     c = {**DEFAULT, **cfg}
     card = tomllib.loads((unit_dir / "card.toml").read_text())
     tgt, unit_id = card["targets"], card["task"]["id"]
     asof = pd.Timestamp(card["provenance"]["data_cutoff"])
+    if asof_override is not None:
+        earlier = pd.Timestamp(asof_override)
+        if pd.isna(earlier) or earlier > asof:
+            raise ValueError('Historical simulation cutoff must not exceed the card cutoff')
+        asof = earlier
     target_type = tgt.get("target_type", "level")
     fam = str(card.get("metadata", {}).get("category", "")).split("-")[-1]
     assets = sorted(tgt["asset_ids"])
@@ -174,6 +179,8 @@ def simulate(unit_dir: pathlib.Path, cfg: dict, seed: int) -> tuple[np.ndarray, 
     centre_cfg = c.get("centre", "m0")                      # 'm0' | 'theta' | ... | 'theta+m0' | per family {"F1": "theta"}
     centre_model = str(centre_cfg.get(fam, "m0") if isinstance(centre_cfg, dict) else centre_cfg)
     monthly = any(spacing[a] is not None and spacing[a] > 20 for a in assets)
+    if asof_override is not None and monthly:
+        raise ValueError('Historical monthly simulation requires a separate vintage/target-period contract')
     cells = [(a, h) for a in assets for h in horizons]
     s_cell = []
     for a, h in cells:
@@ -216,7 +223,7 @@ def simulate(unit_dir: pathlib.Path, cfg: dict, seed: int) -> tuple[np.ndarray, 
     mix = float(c.get("mix_m0", 0) or 0)                        # T7: this share of draws comes from M0's own construction
     if mix > 0:
         m0cfg = {**DEFAULT, "n_draws": int(round(mix * n_draws))}
-        Xm, _, _ = simulate(unit_dir, m0cfg, seed + 7919)
+        Xm, _, _ = simulate(unit_dir, m0cfg, seed + 7919, asof_override=asof_override)
         out[: Xm.shape[0], :] = Xm
     info = {"cfg": c, "seed": seed, "cells": cells, "steps": s_cell, "mu": mu, "sd": sd, "anchor": anchor,
             "family": fam, "monthly": monthly, "unit_id": unit_id, "asof": str(asof.date()),

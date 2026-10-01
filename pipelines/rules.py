@@ -61,20 +61,26 @@ def apply_rules(X: np.ndarray, cells: list, unit_dir: pathlib.Path, asof: str, r
                 notes.append(f"fomc_narrow: {a}@{h} has no scheduled statement in its leg -> spread / {fn.get('factor', 1.15)}")
     cn = rules.get("calm_narrow")
     if cn:
+        step_mode = cn.get('step_mode', 'legacy_difference')
+        if step_mode not in ('legacy_difference', 'target_increments'):
+            raise ValueError('Unknown calm-volatility step mode')
         # E9: a calm leg (recent-volatility ratio below `thr`) of at most `max_h` days is narrowed by `factor`; the
         # board's mean-of-ratios metric rewards a narrower spread on calm realizations (paper/theory_composite.py)
         from engine import _full_series
         try:
             import tomllib
-            fam = str(tomllib.loads((unit_dir / "card.toml").read_text()).get("metadata", {}).get("category", "")).split("-")[-1]
+            card = tomllib.loads((unit_dir / "card.toml").read_text())
+            fam = str(card.get("metadata", {}).get("category", "")).split("-")[-1]
+            target_type = card.get('targets', {}).get('target_type', 'level')
         except Exception:
             fam = ""
+            target_type = 'level'
         if fam in set(cn.get("families", ["F1", "F3", "F4"])):
             a0 = pd.Timestamp(asof)
             for a in sorted(set(x for x, _ in cells)):
                 s_full, stem = _full_series(unit_dir, a, a0)
                 x = np.log(s_full.values) if "fx" in stem else s_full.values
-                d = np.diff(x)
+                d = x if step_mode == 'target_increments' and target_type == 'log_return' else np.diff(x)
                 if len(d) < 25:
                     continue
                 long = d[-int(cn.get("window", 300)):]
